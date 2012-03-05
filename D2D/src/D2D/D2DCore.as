@@ -19,6 +19,12 @@ package D2D{
 	import D2D.Assets.D2DAssets;
 
 	public class D2DCore{
+
+		//D2D created by Dylan Meville
+		//http://dylanmeville.com
+
+		//Genome2D created by pshtif
+		//http://flash-core.com
 	
 		private const VERSION:Number = 0.1	
 		public static var stage:Stage
