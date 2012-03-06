@@ -14,9 +14,8 @@ package{
 		}
 		
 		private function init(e:Event = null):void{
-			if(e){
-				removeEventListener(Event.ADDED_TO_STAGE, init);
-			}
+			if(e) removeEventListener(Event.ADDED_TO_STAGE, init);
+			
 			
 			core = new D2DCore(stage, Game);
 			//Game is the classname of the starting state.
