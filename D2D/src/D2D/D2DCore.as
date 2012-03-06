@@ -1,6 +1,8 @@
 package D2D{
+	import D2D.Assets.D2DAssets;
 	import D2D.Components.D2DCamera;
 	import D2D.D2DState;
+	import D2D.Input.D2DInput;
 	
 	import com.flashcore.g2d.components.G2DCamera;
 	import com.flashcore.g2d.components.G2DComponent;
@@ -10,23 +12,16 @@ package D2D{
 	import com.flashcore.g2d.core.Genome2D;
 	import com.flashcore.g2d.textures.G2DTexture;
 	
+	import flash.desktop.NativeApplication;
 	import flash.display.Bitmap;
 	import flash.display.BitmapData;
 	import flash.display.Stage;
 	import flash.events.Event;
 	import flash.geom.Rectangle;
-	import D2D.Input.D2DInput;
-	import D2D.Assets.D2DAssets;
 
 	public class D2DCore{
-
-		//D2D created by Dylan Meville
-		//http://dylanmeville.com
-
-		//Genome2D created by pshtif
-		//http://flash-core.com
 	
-		private const VERSION:Number = 0.1	
+		private const VERSION:Number = 0.2
 		public static var stage:Stage
 		public static var c_g2d:Genome2D
 		
@@ -49,6 +44,10 @@ package D2D{
 		public static var sw:Number;
 		public static var sh:Number;
 		
+		public static var onClose:Function;
+		public static var activate:Function;
+		public static var deactivate:Function;
+		
 		
 		public function D2DCore(stage:Stage, _initState:Class){
 			D2DCore.stage = stage;
@@ -64,9 +63,32 @@ package D2D{
 			c_g2d.init(D2DCore.stage, G2DStage3DContext);
 			
 			D2DCore.stage.addEventListener(Event.RESIZE, resizedStage);
-			
+			NativeApplication.nativeApplication.addEventListener(Event.EXITING, ClosingApp);
+			NativeApplication.nativeApplication.addEventListener(Event.ACTIVATE, Activate);
+			NativeApplication.nativeApplication.addEventListener(Event.DEACTIVATE, Deactivate);
 			
 		}
+		
+		protected function Deactivate(event:Event):void{
+			trace("-- Application has been Deactivated --");
+			if(deactivate != null) deactivate();
+			NativeApplication.nativeApplication.addEventListener(Event.ACTIVATE, Activate);
+			NativeApplication.nativeApplication.removeEventListener(Event.DEACTIVATE, Deactivate);
+		}
+		
+		protected function Activate(event:Event):void{
+			trace("-- Application has been Activated -- ");
+			if(activate != null) activate();
+			NativeApplication.nativeApplication.removeEventListener(Event.ACTIVATE, Activate);
+			NativeApplication.nativeApplication.addEventListener(Event.DEACTIVATE, Deactivate);
+		}
+		
+		protected function ClosingApp(event:Event):void{
+			trace("-- Application is closing --");
+			if(onClose != null) onClose();
+		}
+		
+		
 		
 		protected function resizedStage(event:Event):void{
 			D2DCore.stage.removeEventListener(Event.RESIZE, resizedStage);
