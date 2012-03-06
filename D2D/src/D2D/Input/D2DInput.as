@@ -74,6 +74,8 @@ package D2D.Input{
 			
 		}
 		
+		
+		
 		protected static function HandleMouseUp(event:MouseEvent):void{
 			Mouse.handleMouseUp(event);
 		}

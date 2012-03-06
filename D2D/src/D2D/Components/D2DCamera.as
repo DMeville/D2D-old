@@ -39,6 +39,11 @@ package D2D.Components{
 				throw new Error("D2DCamera :: Can not follow null node");
 			}
 		}
+		public function SetTarget(obj:G2DNode):void{
+			if(obj){
+				_target = obj;
+			}
+		}
 		
 		public function LookAt(_x:Number, _y:Number):void{
 			//focuses the camera on a specific point instantly.
