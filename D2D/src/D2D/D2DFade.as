@@ -1,4 +1,6 @@
 package D2D{
+	import D2D.Input.D2DInput;
+	
 	import com.flashcore.g2d.components.G2DComponent;
 	import com.flashcore.g2d.components.renderables.G2DSprite;
 	import com.flashcore.g2d.core.G2DNode;
@@ -24,9 +26,9 @@ package D2D{
 			super(p_node);
 			__fades++
 			_fade = this.node.addComponent(G2DSprite) as G2DSprite;
-			_fade.setTexture(G2DTexture.createFromBitmapData("_fade"+String(__fades), new BitmapData(D2DCore.sw, D2DCore.sw, false, 0xFFFFFF)));
-			_fade.node.transform.x = D2DCore.sw/2;
-			_fade.node.transform.y = D2DCore.sh/2;
+			_fade.setTexture(G2DTexture.createFromBitmapData("_fade"+String(__fades), new BitmapData(D2DCore.sw, D2DCore.sh, false, 0xFFFFFF)));
+			_fade.node.transform.x = 0;
+			_fade.node.transform.y = 0
 			SetColor("BLACK");
 		}
 		
@@ -65,6 +67,7 @@ package D2D{
 			super.update(p_deltaTime, p_parentTransformUpdate, p_parentColorUpdate);
 			if(_fading){
 				if(_fadeType == D2DFade.FADE_OUT){
+					DisableButtons();
 					_fade.node.transform.alpha += _fadeTime
 					if(_fade.node.transform.alpha >=1){
 						_fade.node.transform.alpha = 1;
@@ -72,6 +75,7 @@ package D2D{
 						if(callback != null) callback();
 					}
 				} else if(_fadeType == D2DFade.FADE_IN){
+					DisableButtons();
 					_fade.node.transform.alpha -= _fadeTime
 					if(_fade.node.transform.alpha <=0){
 						_fade.node.transform.alpha = 0;
@@ -84,6 +88,10 @@ package D2D{
 			
 		}
 		
+		private function DisableButtons():void{
+			D2DInput.Mouse.reset();
+			D2DInput.Touch.reset();
+		}		
 		
 		public function FadeIn(fadeTime:Number, completeCallback:Function = null):void{
 			callback = completeCallback;

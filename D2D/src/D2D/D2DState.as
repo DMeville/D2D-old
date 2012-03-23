@@ -1,32 +1,29 @@
 package D2D{
-	import com.flashcore.g2d.core.G2DNode;
-	import com.flashcore.g2d.core.Genome2D;
+	import D2D.Assets.D2DAssets;
 	
-	public class D2DState extends G2DNode{
-		
-		private var G2Di:Genome2D;
-		
+	import com.genome2d.components.renderables.GSprite;
+	import com.genome2d.core.GNode;
+	
+	public class D2DState extends GNode{
+				
+		private var s:GSprite;
 		
 		public function D2DState(p_id:String=""){
 			super(p_id);
 			create();
-			
 		}
 		
 		public function create():void{
-			G2Di = Genome2D.getInstance()
-			G2Di.onUpdated.add(update);
+			//trace("-- State Created --");
 		}
 		
-		public function update(_dt:Number):void{
-			
+		public function update(deltaTime:Number):void{
+		
 		}
 		
 		override public function dispose():void{
-			G2Di.onUpdated.remove(update);
 			super.dispose();
-		
+			//trace("-- State Destroyed --");
 		}
-		
 	}
 }

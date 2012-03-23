@@ -1,15 +1,36 @@
 package D2D.Utils{
-	import com.flashcore.g2d.core.G2DNode;
+	import D2D.Components.D2DSprite;
 	
-	import flash.sampler.Sample;
-	
-	import flashx.textLayout.elements.BreakElement;
-	
+	import com.genome2d.components.renderables.GRenderable;
+	import com.genome2d.core.GNode;
 
 	public class D2DUtils{
-	
-		
-		public static function SetColor(obj:G2DNode = null, color:uint = 0xFFFFFF):void{
+		/** Creates a Vector.<String> to make the animation frame assignment process quicker
+		 *  GetFrameSequence("a_", 1, 4) //outputs ["a_1", "a_2", "a_3", "a_4"]
+		 *  
+		 * @param prefix  The animation prefix name (as outlined in the textures XML file)
+		 * @param start   The start frame (inclusive)
+		 * @param end     The end frame (inclusive);
+		 * @return   	  A Vector.<string> of the animation sequence
+		 * 
+		 */		
+		public static function GetFrameSequence(prefix:String, start:int, end:int):Vector.<String>{
+			var sequence:Vector.<String> = new Vector.<String>();
+			for(var i:int = start; i<=end;i++){
+				if(i < 10){
+					sequence.push(String(prefix+"000"+i));
+				} else if (i>=10 && i<100){
+					sequence.push(String(prefix+"00"+i));
+				} else if(i >=100 && i<1000){
+					sequence.push(String(prefix+"0"+i));
+				} else {
+					sequence.push(String(prefix+i));
+				}
+			}
+			
+			return sequence;
+		}
+		public static function SetColor(obj:GNode = null, color:uint = 0xFFFFFF):void{
 			if(obj){
 				var red:Number = color >> 16 & 0xFF;
 				var green:Number = color >> 8 & 0xFF;
@@ -25,6 +46,40 @@ package D2D.Utils{
 				
 			}
 		}
+		
+		public static function Seperate(a:GRenderable, b:GRenderable):void{
+			SeperateX(a,b);
+			SeperateY(a,b);
+			
+		}
+		
+		public static function SeperateY(a:GRenderable, b:GRenderable):void{
+			//a is ninja
+			//b is floor;
+			var c:D2DSprite = (a as D2DSprite)
+			var d:D2DSprite = (b as D2DSprite);
+			if(d.node.transform.y > c.node.transform.y){	
+				c.node.transform.y = d.node.transform.y - d.height/2 - c.height/2
+			} else {
+				c.node.transform.y = d.node.transform.y + d.height/2 + c.height/2
+			}
+			
+		}
+		
+		public static function SeperateX(a:GRenderable, b:GRenderable):void{
+			//a is ninja
+			//b is floor;
+			var c:D2DSprite = (a as D2DSprite)
+			var d:D2DSprite = (b as D2DSprite);
+			if(d.node.transform.x < c.node.transform.x){
+				c.node.transform.x = d.node.transform.x + d.width/2 + c.width/2
+			} else {
+				c.node.transform.x = d.node.transform.x - d.width/2 - c.width/2
+			}
+			
+				
+		}		
+		
 		/**Converts a number to a different unit. 
 		 * Can go both up and down units. (Days->Seconds and Seconds->Days)
 		 * Use the unit constants in the D2DUnits class
@@ -42,7 +97,7 @@ package D2D.Utils{
 			switch(a_unit){
 				case D2DUnits.MILLISECONDS:
 					switch(to_unit){
-						case D2DUnits.MILLISECONDS: return a; BreakElement;
+						case D2DUnits.MILLISECONDS: return a; break;
 						case D2DUnits.SECONDS: return MillisecondsToSeconds(a); break;
 						case D2DUnits.MINUTES: return SecondsToMinutes(MillisecondsToSeconds(a)); break;
 						case D2DUnits.HOURS: return MinutesToHours(SecondsToMinutes(MillisecondsToSeconds(a))); break;
@@ -51,7 +106,7 @@ package D2D.Utils{
 				break;
 				case D2DUnits.SECONDS:
 					switch(to_unit){
-						case D2DUnits.MILLISECONDS: return SecondsToMilliseconds(a) ; BreakElement;
+						case D2DUnits.MILLISECONDS: return SecondsToMilliseconds(a) ; break;
 						case D2DUnits.SECONDS: return a; break;
 						case D2DUnits.MINUTES: return SecondsToMinutes(a); break;
 						case D2DUnits.HOURS: return MinutesToHours(SecondsToMinutes(a)); break;
@@ -60,7 +115,7 @@ package D2D.Utils{
 				break;
 				case D2DUnits.MINUTES:
 					switch(to_unit){
-						case D2DUnits.MILLISECONDS: return SecondsToMilliseconds(MinutesToSeconds(a)); BreakElement;
+						case D2DUnits.MILLISECONDS: return SecondsToMilliseconds(MinutesToSeconds(a)); break;
 						case D2DUnits.SECONDS: return MinutesToSeconds(a); break;
 						case D2DUnits.MINUTES: return a; break;
 						case D2DUnits.HOURS: return MinutesToHours(a); break;
@@ -69,7 +124,7 @@ package D2D.Utils{
 				break;
 				case D2DUnits.HOURS:
 					switch(to_unit){
-						case D2DUnits.MILLISECONDS: return SecondsToMilliseconds(MinutesToSeconds(HoursToMinutes(a))); BreakElement;
+						case D2DUnits.MILLISECONDS: return SecondsToMilliseconds(MinutesToSeconds(HoursToMinutes(a))); break;
 						case D2DUnits.SECONDS: return MinutesToSeconds(HoursToMinutes(a)); break;
 						case D2DUnits.MINUTES: return HoursToMinutes(a); break;
 						case D2DUnits.HOURS: return a; break;
@@ -78,7 +133,7 @@ package D2D.Utils{
 				break;
 				case D2DUnits.DAYS:
 					switch(to_unit){
-						case D2DUnits.MILLISECONDS: return SecondsToMilliseconds(MinutesToSeconds(HoursToMinutes(DaysToHours(a)))); BreakElement;
+						case D2DUnits.MILLISECONDS: return SecondsToMilliseconds(MinutesToSeconds(HoursToMinutes(DaysToHours(a)))); break;
 						case D2DUnits.SECONDS: return MinutesToSeconds(HoursToMinutes(DaysToHours(a))); break;
 						case D2DUnits.MINUTES: return HoursToMinutes(DaysToHours(a)); break;
 						case D2DUnits.HOURS: return DaysToHours(a); break;
@@ -139,5 +194,9 @@ package D2D.Utils{
 		}
 		
 
+		public static function MatchPosition(object:GNode, target:GNode):void{
+			object.transform.x = target.transform.x;
+			object.transform.y = target.transform.y;
+		}
 	}
 }

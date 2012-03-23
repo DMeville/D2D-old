@@ -1,13 +1,14 @@
 package D2D.Components{
 	import D2D.D2DCore;
+	import D2D.Utils.D2DUtils;
 	
-	import com.flashcore.g2d.components.G2DCamera;
-	import com.flashcore.g2d.core.G2DNode;
+	import com.genome2d.components.GCamera;
+	import com.genome2d.core.GNode;
 	
 	import flash.geom.Point;
 	import flash.geom.Rectangle;
 	
-	public class D2DCamera extends G2DCamera{
+	public class D2DCamera extends GCamera{
 		
 		public static const STYLE_LOCK_ON:int = 0;
 		public static const STYLE_LOCK_ON_X:int = 1; //doesn't move in the y direction;
@@ -16,22 +17,25 @@ package D2D.Components{
 		public static const STYLE_DELAY_FOLLOW_X:int = 4;
 		public static const STYLE_DELAY_FOLLOW_Y:int = 5;
 			
-		private var _target:G2DNode;
+		private var _target:GNode;
 		private var _style:int
 	
 		public var _worldBounds:Rectangle;
-		public var overlay:G2DNode;
 		private var _targetPoint:Point = new Point(-1,-1);
 		
+		public var overlay:GNode;
+		public var transitionContainer:GNode;
 		
-		public function D2DCamera(p_node:G2DNode)
-		{
+		
+		public function D2DCamera(p_node:GNode) {
 			super(p_node);
-			overlay = new G2DNode("camera_overlay");
+			overlay = new GNode("camera_overlay");
 			this.node.addChild(overlay);
+			transitionContainer = new GNode("transition_container");
+			this.node.addChild(transitionContainer);
 		}
 		
-		public function Follow(obj:G2DNode, style:int):void{
+		public function Follow(obj:GNode, style:int):void{
 			if(obj){
 				_target = obj;
 				_style = style;
@@ -39,7 +43,7 @@ package D2D.Components{
 				throw new Error("D2DCamera :: Can not follow null node");
 			}
 		}
-		public function SetTarget(obj:G2DNode):void{
+		public function SetTarget(obj:GNode):void{
 			if(obj){
 				_target = obj;
 			}
@@ -91,14 +95,14 @@ package D2D.Components{
 							this.node.transform.y = _target.transform.y
 							break;
 						case STYLE_DELAY_FOLLOW:
-							this.node.transform.x -= (this.node.transform.x - _target.transform.x)*0.05
-							this.node.transform.y -= (this.node.transform.y - _target.transform.y)*0.05
+							this.node.transform.x -= (this.node.transform.x - _target.transform.x)*0.1
+							this.node.transform.y -= (this.node.transform.y - _target.transform.y)*0.1
 							break;
 						case STYLE_DELAY_FOLLOW_X:
-							this.node.transform.x -= (this.node.transform.x - _target.transform.x)*0.05
+							this.node.transform.x -= (this.node.transform.x - _target.transform.x)*0.1
 							break;
 						case STYLE_DELAY_FOLLOW_Y:
-							this.node.transform.y -= (this.node.transform.y - _target.transform.y)*0.05
+							this.node.transform.y -= (this.node.transform.y - _target.transform.y)*0.1
 							break;
 					} // end style
 					CheckEdges();
@@ -115,6 +119,7 @@ package D2D.Components{
 			}
 			this.node.transform.x = Math.round(this.node.transform.x);
 			this.node.transform.y = Math.round(this.node.transform.y);
+			
 		}
 		
 		
@@ -153,5 +158,11 @@ package D2D.Components{
 		}		
 		
 		
+		public function Reset():void{
+			StopFollowing();
+			for(var i:int = 0; i< overlay.numChildren; i++){
+				overlay.removeChild(overlay.getChildAt(i));
+			}
+		}
 	} //end
 }

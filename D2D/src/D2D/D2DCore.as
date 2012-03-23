@@ -1,196 +1,186 @@
 package D2D{
 	import D2D.Assets.D2DAssets;
 	import D2D.Components.D2DCamera;
-	import D2D.D2DState;
 	import D2D.Input.D2DInput;
+	import D2D.Transitions.*;
+	import D2D.Utils.D2DTimerManager;
 	
-	import com.flashcore.g2d.components.G2DCamera;
-	import com.flashcore.g2d.components.G2DComponent;
-	import com.flashcore.g2d.components.renderables.G2DSprite;
-	import com.flashcore.g2d.context.stage3d.G2DStage3DContext;
-	import com.flashcore.g2d.core.G2DNode;
-	import com.flashcore.g2d.core.Genome2D;
-	import com.flashcore.g2d.textures.G2DTexture;
+	import com.genome2d.components.GCamera;
+	import com.genome2d.components.GComponent;
+	import com.genome2d.components.renderables.GMovieClip;
+	import com.genome2d.components.renderables.GSprite;
+	import com.genome2d.context.GBlendMode;
+	import com.genome2d.context.GContextConfig;
+	import com.genome2d.core.GNode;
+	import com.genome2d.core.GNodeFactory;
+	import com.genome2d.core.GNodePool;
+	import com.genome2d.core.Genome2D;
+	import com.genome2d.physics.GPhysics;
+	import com.genome2d.textures.factories.GTextureFactory;
 	
-	import flash.desktop.NativeApplication;
-	import flash.display.Bitmap;
-	import flash.display.BitmapData;
 	import flash.display.Stage;
 	import flash.events.Event;
 	import flash.geom.Rectangle;
+	import flash.utils.getTimer;
 
 	public class D2DCore{
 	
-		private const VERSION:Number = 0.2
-		public static var stage:Stage
-		public static var c_g2d:Genome2D
+		private const VERSION:Number = 0.5;
+		public static var stage:Stage;
+		public static var GCore:Genome2D;
+		public static var sw:int;
+		public static var sh:int;
+		public static var prevTime:Number = 0
 		
+		private static var _currentState:D2DState;
+		private var _initState:Class;
+		private static var _switchStateRequested:Boolean;
+		private static var _requestedState:Class;
+		private static var _startedStateSwitch:Boolean;
+		private static var _transition:D2DTransition;
+		private static var _transitionCount:int = 0;
+		private static var _transitionClass:Class = D2DSlamTransition
 		
-		private var _initState:Class
-		public static var _currentState:D2DState
-		public static var stateCount:int = 0;
-		private static var _switchStateRequested:Boolean = false
-		public static var _startedStateSwitch:Boolean = false
-		private static var _requestedState:Class
-		private var _fade:D2DFade
-		private var _fadeCount:int = 0
+		private var core:GNode
+		private static var container:GNode;
+		public static var camera:D2DCamera
 		
-		private var _transitionType:int = 0;
+		public static var Paused:Boolean;
+		private static var stateCount:int = 0
 		
-		private var core:G2DNode
-		public static var g_container:G2DNode
-		public static var g_camera:D2DCamera;
-		public static var transition_container:G2DNode
-		public static var sw:Number;
-		public static var sh:Number;
-		
-		public static var onClose:Function;
-		public static var activate:Function;
-		public static var deactivate:Function;
-		
-		
-		public function D2DCore(stage:Stage, _initState:Class){
+		public function D2DCore(stage:Stage, _initState:Class) {
 			D2DCore.stage = stage;
-			
-			sw = stage.stageWidth;
-			sh = stage.stageHeight;
-			
 			this._initState = _initState;
-			
-			c_g2d = Genome2D.getInstance()
-			c_g2d.onInitialized.addOnce(G2DInitialized);
-			c_g2d.onFailed.addOnce(G2DFailed);
-			c_g2d.init(D2DCore.stage, G2DStage3DContext);
-			
-			D2DCore.stage.addEventListener(Event.RESIZE, resizedStage);
-			NativeApplication.nativeApplication.addEventListener(Event.EXITING, ClosingApp);
-			NativeApplication.nativeApplication.addEventListener(Event.ACTIVATE, Activate);
-			NativeApplication.nativeApplication.addEventListener(Event.DEACTIVATE, Deactivate);
-			
-		}
-		
-		protected function Deactivate(event:Event):void{
-			trace("-- Application has been Deactivated --");
-			if(deactivate != null) deactivate();
-			NativeApplication.nativeApplication.addEventListener(Event.ACTIVATE, Activate);
-			NativeApplication.nativeApplication.removeEventListener(Event.DEACTIVATE, Deactivate);
-		}
-		
-		protected function Activate(event:Event):void{
-			trace("-- Application has been Activated -- ");
-			if(activate != null) activate();
-			NativeApplication.nativeApplication.removeEventListener(Event.ACTIVATE, Activate);
-			NativeApplication.nativeApplication.addEventListener(Event.DEACTIVATE, Deactivate);
-		}
-		
-		protected function ClosingApp(event:Event):void{
-			trace("-- Application is closing --");
-			if(onClose != null) onClose();
-		}
-		
-		
-		
-		protected function resizedStage(event:Event):void{
-			D2DCore.stage.removeEventListener(Event.RESIZE, resizedStage);
-			trace("D2DCore :: Stage has been resized");
 			sw = stage.stageWidth;
 			sh = stage.stageHeight;
 			
+			GCore = Genome2D.getInstance();
+			GCore.onInitialized.addOnce(GInitialized);
+			GCore.onFailed.addOnce(GFailed);
+			GCore.init(D2DCore.stage, new GContextConfig);
+			
+			D2DCore.stage.addEventListener(Event.RESIZE, ResizedStage);
+			//needs Event.EXITING, Event.ACTIVATE, Event.DEACTIVATE listeners, but I can't add them 
+			//because this is a web app?
 		}
 		
-		private function G2DFailed():void{
-			throw new Error("!-- Genome2D failed to initialize --!");
-			
-		}
-		
-		private function G2DInitialized():void{
-			D2DAssets.init();
-			D2DInput.init();
-			core = new G2DNode("core0");
-			c_g2d.root.addChild(core);
-			c_g2d.onUpdated.add(CoreUpate);
-			
-			g_container = new G2DNode("golbalContainer0");
-			core.addChild(g_container);
-			transition_container = new G2DNode("transition_container0");
-			core.addChild(transition_container);
-			
-			g_camera = G2DComponent.createWithNode(D2DCamera, "globalCamera0") as D2DCamera;
-			g_camera.node.transform.x = sw/2;
-			g_camera.node.transform.y = sh/2
-			core.addChild(g_camera.node);
-		
-			create()
-			
-		}
-		
-		private function CoreUpate(_dt:Number):void{
-			D2DInput.update();
-			if(_switchStateRequested){
-				if(!_startedStateSwitch){
-					_startedStateSwitch = true;
-					if(_fade == null){
-						if(_transitionType == 0){ //straight black fade;
-							_fade = G2DComponent.createWithNode(D2DFade, "_fade"+ String(_fadeCount)) as D2DFade;
-						} else if(_transitionType == 1){ //white
-							_fade = G2DComponent.createWithNode(D2DFade, "_fade"+ String(_fadeCount)) as D2DFade;
-							_fade.SetColor("WHITE");
-						} 
-							
-						_fadeCount++
-					}
-					_fade.FadeOut(1, _switchState)
-					transition_container.addChild(_fade.node);
-				}
+		public static function Pause():void{
+			if(!Paused){
+				Paused = true;
 			}
+		}
+		public static function Unpause():void{
+			if(Paused){
+				Paused = false;
+			}
+		}
+		
+		
+		protected function ResizedStage(event:Event):void{
+			trace("D2DCore :: Stage has been resized to (w="+stage.fullScreenWidth+", h="+stage.fullScreenHeight+")");
+			D2DCore.stage.removeEventListener(Event.RESIZE, ResizedStage);
+			sw = stage.fullScreenWidth
+			sh = stage.fullScreenWidth;
+		}
+		
+		private function GFailed():void{
+			throw new Error("!-- Genome2D failed to initialize --! - Check the wmode!");
+			
+		}
+		
+		private function GInitialized():void{
+			trace("-- D2DCore & Genome2D initialized! -- ")
+			core = new GNode("core0");
+			GCore.root.addChild(core);
+			D2DCore.stage.addEventListener(Event.ENTER_FRAME, CoreUpdate);
+			GCore.autoUpdate = false;
+			
+			container = new GNode("container0");
+			core.addChild(container);
+			
+			camera = GNodeFactory.createNodeWithComponent(D2DCamera, "camera0") as D2DCamera;
+			camera.node.transform.x = stage.stageWidth/2;
+			camera.node.transform.y = stage.stageHeight/2;
+			core.addChild(camera.node);
+			
+			D2DAssets.init();
+			D2DInput.init()
+			D2DTimerManager.init();
+			
+			create();
+			
 			
 		}
 		
 		private function create():void{
+			trace("-- D2DCore::Create() -- ");
 			_currentState = new _initState("initState");
-			g_container.addChild(_currentState);
-		}	
+			container.addChild(_currentState);
+		}
+		
+		private function CoreUpdate(e:Event):void{
+			var currentTime:Number = getTimer();
+			var deltaTime:int = currentTime - prevTime;
+			prevTime = currentTime;
+			
+			if(Paused) deltaTime = 0
+			D2DInput.update();
+			D2DTimerManager.update(deltaTime);
+			_currentState.update(deltaTime);
+			if(_switchStateRequested && _transition == null){ //this null check makes it so you cant switch states
+				if(!_startedStateSwitch){						// while a switch is already in progress
+					_startedStateSwitch = true;
+					if(_transition == null){
+						_transitionCount++;
+						_transition = new _transitionClass("_transition_"+_transitionCount);
+						camera.transitionContainer.addChild(_transition);
+						_transition.FadeOut(_switchState);
+					}
+				}
+			}
+			if(_transition != null) _transition.update(deltaTime);
+			
+			
+			GCore.update();
+			GCore.beginRender();
+			GCore.render();
+			GCore.endRender();
+		}
 		
 		public static function switchState(_state:Class):void{
-			_switchStateRequested = true;
-			_startedStateSwitch = false;
-			_requestedState = _state;
+			trace(" -- D2DCore::SwitchState requested.  Will change on next update");
+			if(!_switchStateRequested){
+				_switchStateRequested = true;
+				_startedStateSwitch = false;
+				_requestedState = _state;
+			}
 		}
 		
-		private function _switchState():void{
-			trace("D2DCore :: switchState");
-			g_container.removeChild(_currentState);
+		public static function _switchState():void{
+			trace(" ------- D2DCore :: Actually calling the switchState");
+			container.removeChild(_currentState);
+			camera.Reset();
 			_currentState.dispose();
+			_currentState = null
 			_currentState = new _requestedState("state"+String(stateCount));
-			g_container.addChild(_currentState);
+			container.addChild(_currentState);
 			stateCount++;
 			_switchStateRequested = false
-			_fade.FadeIn(1);
+			_transition.FadeIn(_transitionFinished);
 		}
 		
-		public function SetTransitionType(type:int):void{
-			if(type == 0 || type == 1){
-				_transitionType = type;
-			}
-			
-		}
+		private static function _transitionFinished():void{
+			camera.transitionContainer.removeChild(_transition);
+			_transition = null;
+	
+		}	
 		
-		public static function SetBackgroundColor(color:uint):void{
-			var red:Number = color >> 16 & 0xFF;
-			var green:Number = color >> 8 & 0xFF;
-			var blue:Number = color & 0xFF;
-			
-			red = Math.floor((red/255)*1000)/1000
-			green = Math.floor((green/255)*1000)/1000
-			blue = Math.floor((blue/255)*1000)/1000
-				
-			g_camera.backgroundBlue = blue;
-			g_camera.backgroundRed = red;
-			g_camera.backgroundGreen = green;
+		public static function SetTransition(transition:Class):void{
+			_transitionClass = transition;
 		}
 		
 		public static function SetWorldBounds(rect:Rectangle):void{
-			g_camera._worldBounds = rect;		
+			camera._worldBounds = rect;		
 		}
 	}
 }

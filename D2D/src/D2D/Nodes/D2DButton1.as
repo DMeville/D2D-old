@@ -1,4 +1,4 @@
-package D2D.Components{
+package D2D.Nodes{
 	import D2D.Assets.D2DAssets;
 	import D2D.Input.D2DInput;
 	
@@ -11,7 +11,7 @@ package D2D.Components{
 	
 	import flash.text.TextFormat;
 	
-	public class D2DButton extends G2DComponent{
+	public class D2DButton1 extends G2DComponent{
 		
 		
 		private var clickedCallback:Function
@@ -21,7 +21,7 @@ package D2D.Components{
 		private var textfield:G2DNativeText
 		
 	
-		public function D2DButton(p_node:G2DNode)
+		public function D2DButton1(p_node:G2DNode)
 		{
 			super(p_node);
 			lowerNode = new G2DNode("lower_"+p_node.id);

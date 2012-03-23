@@ -2,15 +2,15 @@ package D2D.Components{
 	import D2D.Assets.D2DAssets;
 	import D2D.D2DCore;
 	
-	import com.flashcore.g2d.components.G2DComponent;
-	import com.flashcore.g2d.components.renderables.G2DSprite;
-	import com.flashcore.g2d.core.G2DNode;
-	import com.flashcore.g2d.textures.G2DTexture;
-	import com.flashcore.g2d.textures.G2DTextureAtlas;
+	import com.genome2d.components.GComponent;
+	import com.genome2d.components.renderables.GSprite;
+	import com.genome2d.core.GNode;
+	import com.genome2d.textures.GTexture;
+	import com.genome2d.textures.GTextureAtlas;
 	
 	import flash.geom.Rectangle;
 	
-	public class D2DTilemap extends G2DComponent{
+	public class D2DTilemap extends GComponent{
 		
 		private var rows:Array; //x
 		private var cols:Array; //y;
@@ -21,16 +21,16 @@ package D2D.Components{
 		public static var TileHeight:int = 0;
 		public static var _data:Array;
 		public var tiles:int = 0
-		private var texture:G2DTextureAtlas
+		private var texture:GTextureAtlas
 	
-		public function D2DTilemap(p_node:G2DNode)
+		public function D2DTilemap(p_node:GNode)
 		{
 			super(p_node);
 			rows = new Array();
 			cols = new Array();	
 		}
 		
-		public function LoadMap(MapData:String, _TileWidth:int, _TileHeight:int, _tiles:G2DTextureAtlas):void{
+		public function LoadMap(MapData:String, _TileWidth:int, _TileHeight:int, _tiles:GTextureAtlas):void{
 			TileWidth = _TileWidth;
 			TileHeight = _TileHeight;
 			texture = _tiles;
@@ -55,8 +55,8 @@ package D2D.Components{
 					_data.push(int(columns[column++]));
 			}
 			
-			D2DCore.g_camera._worldBounds = new Rectangle(0,0, widthInTiles*TileWidth, heightInTiles*TileHeight);
-			trace(D2DCore.g_camera._worldBounds);
+			D2DCore.camera._worldBounds = new Rectangle(0,0, widthInTiles*TileWidth, heightInTiles*TileHeight);
+			trace(D2DCore.camera._worldBounds);
 			Draw()
 			trace(tiles);
 			
@@ -67,16 +67,19 @@ package D2D.Components{
 		
 		
 		private function Draw():void{
-			var s:G2DSprite;
+			var s:GSprite;
 			var tile:int 
-			var t:G2DTexture
+			var t:GTexture
 			for(var i:int = 0; i< widthInTiles;i++){
 				for(var j:int = 0; j<heightInTiles;j++){
 					tile = getTile(i,j);
 					if(tile >0){
 						this.tiles++
 						//D2DCore.c_g2d.blit(TileWidth/2 +i*TileWidth, TileHeight/2 +i*TileHeight, D2DAssets.WhiteTexture);
-						s = G2DComponent.createWithNode(G2DSprite, "tile_"+i+"_"+j) as G2DSprite;
+						var sN:GNode = new GNode("tile_"+i+"_"+j);
+						s = sN.addComponent(GSprite) as GSprite;
+						
+			
 						
 						if(tile+1 < 10){
 							t = texture.getTexture("tile000"+(tile+1));

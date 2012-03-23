@@ -1,21 +1,29 @@
 package D2D.Components{
-	import com.flashcore.g2d.components.renderables.G2DSprite;
-	import com.flashcore.g2d.core.G2DNode;
+	import com.genome2d.core.GNode;
+	import com.genome2d.components.renderables.GSprite;
+	import com.genome2d.textures.GTexture;
 	
 	import flash.geom.Point;
 	
-	public class D2DSprite extends G2DSprite{
+	public class D2DSprite extends GSprite{
 		
-		public function scrollFactor:Point = new Point(1,1);
-	
-		public function D2DSprite(p_node:G2DNode)
-		{
+		public var width:Number = 0;
+		public var height:Number = 0;
+		public var immovable:Boolean = false
+		
+		public function D2DSprite(p_node:GNode){
 			super(p_node);
 		}
 		
-		override public function update(p_deltaTime:Number, p_parentTransformUpdate:Boolean, p_parentColorUpdate:Boolean):void{
-			super.update(p_deltaTime, p_parentTransformUpdate, p_parentColorUpdate);
-			
+		
+		public function setTextureWithSize(p_texture:GTexture, width:Number = 0, height:Number = 0):void{
+			setTexture(p_texture)
+			this.width = width;
+			this.height = height
+		}
+		public function SetSize(width:Number, height:Number = 0):void{
+			this.width = width;
+			this.height = height;
 		}
 	}
 }

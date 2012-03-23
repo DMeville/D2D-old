@@ -1,17 +1,17 @@
 package D2D.Components{
 	import D2D.D2DCore;
 	
-	import com.flashcore.g2d.components.G2DComponent;
-	import com.flashcore.g2d.core.G2DNode;
+	import com.genome2d.components.GComponent;
+	import com.genome2d.core.GNode;
 	
 	import flash.geom.Point;
 	
-	public class D2DParallax extends G2DComponent{
+	public class D2DParallax extends GComponent{
 		
-		private var parallaxFactor:Point = new Point(1,1);
+		private var parallaxFactor:Point = new Point(1.0,1.0);
 		private var _realPoint:Point 
 	
-		public function D2DParallax(p_node:G2DNode)
+		public function D2DParallax(p_node:GNode)
 		{
 			super(p_node);
 			
@@ -26,8 +26,8 @@ package D2D.Components{
 		override public function update(p_deltaTime:Number, p_parentTransformUpdate:Boolean, p_parentColorUpdate:Boolean):void{
 			//trace(_realPoint);
 			super.update(p_deltaTime, p_parentTransformUpdate, p_parentColorUpdate);
-			this.node.transform.x = _realPoint.x + (D2DCore.g_camera.node.transform.x - D2DCore.sw/2)*parallaxFactor.x;
-			this.node.transform.y = _realPoint.y + (D2DCore.g_camera.node.transform.y - D2DCore.sh/2)*parallaxFactor.y;
+			this.node.transform.x = _realPoint.x + (D2DCore.camera.node.transform.x - D2DCore.sw/2)*parallaxFactor.x;
+			this.node.transform.y = _realPoint.y + (D2DCore.camera.node.transform.y - D2DCore.sh/2)*parallaxFactor.y;
 						
 		}
 		public function SetParallaxFactor(x:Number, y:Number):void{
