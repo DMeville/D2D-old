@@ -5,17 +5,17 @@ package D2D.Utils{
 	import com.genome2d.core.GNode;
 
 	public class D2DUtils{
-		/** Creates a Vector.<String> to make the animation frame assignment process quicker
+		/** Creates an Array to make the animation frame assignment process quicker
 		 *  GetFrameSequence("a_", 1, 4) //outputs ["a_1", "a_2", "a_3", "a_4"]
 		 *  
 		 * @param prefix  The animation prefix name (as outlined in the textures XML file)
 		 * @param start   The start frame (inclusive)
 		 * @param end     The end frame (inclusive);
-		 * @return   	  A Vector.<string> of the animation sequence
+		 * @return   	  An Array of the animation sequence
 		 * 
 		 */		
-		public static function GetFrameSequence(prefix:String, start:int, end:int):Vector.<String>{
-			var sequence:Vector.<String> = new Vector.<String>();
+		public static function GetFrameSequence(prefix:String, start:int, end:int):Array{
+			var sequence:Array = new Array();
 			for(var i:int = start; i<=end;i++){
 				if(i < 10){
 					sequence.push(String(prefix+"000"+i));

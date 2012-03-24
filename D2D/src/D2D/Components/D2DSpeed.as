@@ -18,7 +18,6 @@ package D2D.Components {
 		
 		override public function update(p_deltaTime:Number, p_parentTransformUpdate:Boolean, p_parentColorUpdate:Boolean):void{
 			super.update(p_deltaTime, p_parentTransformUpdate, p_parentColorUpdate);
-			
 			if(Move){
 				velocity.x += acceleration.x*(p_deltaTime/1000)
 				velocity.y += acceleration.y*(p_deltaTime/1000)

@@ -23,12 +23,12 @@ package D2D.Components{
 				velocity.x = 0
 			} else {
 				if(D2DInput.Keys.LEFT || D2DInput.Keys.A){
-					velocity.x -= 0.7;
+					velocity.x -= 5*(p_deltaTime/1000)
 					if(velocity.x <= -speed){
 						velocity.x = -speed
 					}
 				} else if(D2DInput.Keys.RIGHT ||D2DInput.Keys.D){
-					velocity.x += 0.7;
+					velocity.x += 5*(p_deltaTime/1000)
 					if(velocity.x >=speed){
 						velocity.x = speed;
 					}
@@ -39,12 +39,12 @@ package D2D.Components{
 				velocity.y = 0
 			} else {
 				if(D2DInput.Keys.UP || D2DInput.Keys.W){
-					velocity.y -= 0.7;
+					velocity.y -= 5*(p_deltaTime/1000)
 					if(velocity.y <= -speed){
 						velocity.y = -speed
 					}
 				} else if(D2DInput.Keys.DOWN ||D2DInput.Keys.S){
-					velocity.y += 0.7;
+					velocity.y += 5*(p_deltaTime/1000)
 					if(velocity.y >=speed){
 						velocity.y = speed;
 					}

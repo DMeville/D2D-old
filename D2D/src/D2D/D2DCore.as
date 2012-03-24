@@ -21,6 +21,7 @@ package D2D{
 	import flash.display.Stage;
 	import flash.events.Event;
 	import flash.geom.Rectangle;
+	import flash.text.TextField;
 	import flash.utils.getTimer;
 
 	public class D2DCore{
@@ -58,6 +59,7 @@ package D2D{
 			GCore.onInitialized.addOnce(GInitialized);
 			GCore.onFailed.addOnce(GFailed);
 			GCore.init(D2DCore.stage, new GContextConfig);
+		
 			
 			D2DCore.stage.addEventListener(Event.RESIZE, ResizedStage);
 			//needs Event.EXITING, Event.ACTIVATE, Event.DEACTIVATE listeners, but I can't add them 
@@ -67,11 +69,13 @@ package D2D{
 		public static function Pause():void{
 			if(!Paused){
 				Paused = true;
+				GCore.paused = true;
 			}
 		}
 		public static function Unpause():void{
 			if(Paused){
 				Paused = false;
+				GCore.paused = false;
 			}
 		}
 		
@@ -85,7 +89,6 @@ package D2D{
 		
 		private function GFailed():void{
 			throw new Error("!-- Genome2D failed to initialize --! - Check the wmode!");
-			
 		}
 		
 		private function GInitialized():void{
@@ -108,12 +111,10 @@ package D2D{
 			D2DTimerManager.init();
 			
 			create();
-			
-			
 		}
 		
 		private function create():void{
-			trace("-- D2DCore::Create() -- ");
+			//trace("-- D2DCore::Create() -- ");
 			_currentState = new _initState("initState");
 			container.addChild(_currentState);
 		}
@@ -148,7 +149,7 @@ package D2D{
 		}
 		
 		public static function switchState(_state:Class):void{
-			trace(" -- D2DCore::SwitchState requested.  Will change on next update");
+			//trace(" -- D2DCore::SwitchState requested.  Will change on next update");
 			if(!_switchStateRequested){
 				_switchStateRequested = true;
 				_startedStateSwitch = false;
@@ -157,7 +158,7 @@ package D2D{
 		}
 		
 		public static function _switchState():void{
-			trace(" ------- D2DCore :: Actually calling the switchState");
+			//trace(" ------- D2DCore :: Actually calling the switchState");
 			container.removeChild(_currentState);
 			camera.Reset();
 			_currentState.dispose();

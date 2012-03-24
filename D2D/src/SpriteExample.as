@@ -9,6 +9,7 @@ package{
 	import D2D.Utils.D2DTimer;
 	import D2D.Utils.D2DUtils;
 	
+	import com.genome2d.components.renderables.GMovieClip;
 	import com.genome2d.components.renderables.GRenderable;
 	import com.genome2d.components.renderables.GSprite;
 	import com.genome2d.context.GBlendMode;
@@ -20,6 +21,8 @@ package{
 		
 		private var s:GSprite;
 		private var c:GSprite;
+		private var mc:GMovieClip
+		private var mc2:GMovieClip
 	
 		public function SpriteExample(p_id:String="") {
 			super(p_id);
@@ -48,10 +51,25 @@ package{
 			
 			var hud:GSprite = GNodeFactory.createNodeWithComponent(GSprite, "hud") as GSprite;
 			hud.setTexture(D2DAssets.WhiteTexture);
+			hud.node.transform.x -= 150;
 			D2DUtils.SetColor(hud.node, 0xFF0000);
 			D2DCore.camera.overlay.addChild(hud.node);
 			
+			mc = GNodeFactory.createNodeWithComponent(GMovieClip, "mc") as GMovieClip;
+			mc.setTextureAtlas(D2DAssets.D2DLogoAtlas);
+			mc.frameRate = 24;
+			mc.frames = D2DAssets.D2DLogoFrames
+			mc.node.transform.x = 400;
+			mc.node.transform.y = 400;
+			addChild(mc.node);
 			
+			mc2 = GNodeFactory.createNodeWithComponent(GMovieClip, "mc2") as GMovieClip;
+			mc2.setTextureAtlas(D2DAssets.D2DLogoAtlas);
+			mc2.frameRate = 24;
+			mc2.frames = D2DAssets.D2DLogoFrames
+			mc2.node.transform.x = 432;
+			mc2.node.transform.y = 432;
+			addChild(mc2.node);
 			
 		}
 		
@@ -70,6 +88,16 @@ package{
 			if(D2DInput.Keys.justReleased("SPACE")){
 				trace("released");
 				D2DCore.switchState(SpriteExample);
+			}
+			if(mc.hitTestPoint(D2DInput.Mouse3D)){
+				mc.node.transform.alpha = 0.5;
+			} else {
+				mc.node.transform.alpha = 1;
+			}
+			if(mc2.hitTestPoint(D2DInput.Mouse3D)){
+				mc2.node.transform.alpha = 0.5;
+			} else {
+				mc2.node.transform.alpha = 1;
 			}
 			
 		}
