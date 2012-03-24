@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with TexturePacker http://texturepacker.com-->
+<!-- $TexturePacker:SmartUpdate:7f2d7f9e80cff1a1b69f3801b711d08d$ -->
+<TextureAtlas imagePath="Defaults.png">
+    <SubTexture name="DefaultButton" x="0" y="0" width="353" height="136"/>
+    <SubTexture name="DefaultWindow" x="0" y="136" width="485" height="260"/>
+</TextureAtlas>
